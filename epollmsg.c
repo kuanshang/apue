@@ -5,7 +5,6 @@
 #include <sys/msg.h>
 #include <sys/socket.h>
 
-
 #define NQ 3
 #define MAXMSZ 512
 #define KEY 0x123
@@ -35,9 +34,7 @@ void* helper (void*arg){
 		
 		if(write(tip->fd, m.mtext, n) < 0)
 			err_sys("write error");
-		
 	}
-	
 }
 
 int main(){
@@ -58,7 +55,6 @@ int main(){
 	if(epollfd < 0){
 		err_exit(err, "epoll_create fail.");
 	}
-	
 
 	for(i =0; i<NQ; i++){
 		if((qid[i] = msgget((KEY+i), IPC_CREAT|0666)) < 0)
@@ -73,7 +69,6 @@ int main(){
 		//pfd[i].events = POLLIN;
 		
 		epoll_fd[i] = fd[0];
-
 		ev.events = EPOLLIN;
 		ev.data.fd = fd[0];
 		if(epoll_ctl(epollfd, EPOLL_CTL_ADD, fd[0], &ev) == -1)
@@ -84,9 +79,7 @@ int main(){
 		
 		if((err = pthread_create(&tid[i], NULL, helper, &ti[i])) != 0)
 			err_exit(err, "pthread_create error");
-	
 	}
-
 
 	for(;;){
 		
@@ -104,7 +97,7 @@ int main(){
 			if(ev.data.fd == epoll_fd[i])
 				break;
 		}
-		
+
 		printf("queue id %d, message %s\n", qid[i], buf);		
 	}
 	exit(0);
