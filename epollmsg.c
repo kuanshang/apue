@@ -94,16 +94,18 @@ int main(){
 		nfds = epoll_wait(epollfd, &ev, NQ, -1);
 		if(nfds< 0)
 			err_sys("poll err");
-		for(i= 0; i< NQ;i++){
-			printf("i:%d, ev.data.fd:%d, epoll_fd:%d.\n",i, ev.data.fd, epoll_fd[i]);
-			if(ev.data.fd == epoll_fd[i]){
-				if((n=read(ev.data.fd, buf, sizeof(buf))) < 0)
-					err_sys("read error");
-				buf[n] = 0;
-				printf("queue id %d, message %s\n", qid[i], buf);
-			}
+
+		if((n=read(ev.data.fd, buf, sizeof(buf))) < 0)
+				err_sys("read error");
+			buf[n] = 0;
+		
+		//this "for" loop just to get qid[i].
+		for(i = 0; i< NQ; i++){
+			if(ev.data.fd == epoll_fd[i])
+				break;
 		}
 		
+		printf("queue id %d, message %s\n", qid[i], buf);		
 	}
 	exit(0);
 }
